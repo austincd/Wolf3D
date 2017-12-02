@@ -1,0 +1,230 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   wolf3d.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adaly <marvin@42.fr>                       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/11/08 23:09:19 by adaly             #+#    #+#             */
+/*   Updated: 2017/11/24 14:58:03 by adaly            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef WOLF3D_H
+# define WOLF3D_H
+# define MAX_X 1024
+# define MAX_Y 1024
+# define LIMIT_ACTORS 32
+# define LIMIT_OBJS 32
+# define LIMIT_TEXRES 16
+# define DECAY_VELO 0.001
+# define DECAY_ROTVELO 0.001
+
+
+# include "../libft/libft.h"
+# include <stdio.h>
+# include <math.h>
+# include <time.h>
+# include "../minilibx/mlx.h"
+# include "../minilibx/mlx_keys_macos.h"
+
+typedef struct	s_pix{
+	unsigned char	r;
+	unsigned char	g;
+	unsigned char	b;
+	unsigned char	alpha;
+}				t_pix;
+
+typedef struct	s_texLn{
+	t_pix		col[LIMIT_TEXRES];
+}				t_texLn;
+
+typedef struct	s_tex{
+	t_texLn		row[LIMIT_TEXRES];
+	int			texHeight;
+	int			texWidth;
+}				t_tex;
+
+typedef struct	s_file{
+	char	path[512];
+	int 	fd;
+}				t_file;
+
+typedef struct	s_frame{
+	int		resX;
+	int		resY;
+	void	*framePtr;
+	void	*frameData;
+}				t_frame;
+
+typedef	struct	s_mlx{
+	void		*mlx;
+	void		*win;
+	int			bppx;
+	int			endi;
+	int			bpln;
+	t_frame		frame;
+}				t_mlx;
+
+typedef struct	s_mapLn{
+	char		col[MAX_X + 1];
+}				t_mapLn;
+
+typedef struct	s_map{
+	int			mapX;
+	int			mapY;
+	t_file		wallMap;
+	long double	spawnX;
+	long double spawnY;
+	t_mapLn		row[MAX_Y];
+	t_mapLn		walls[MAX_Y + 1];
+}				t_map;
+
+typedef struct		s_kb
+{
+	char			exit;
+	char			forward;
+	char			backward;
+	char			left;
+	char			right;
+	char			fadeLeft;
+	char			fadeRight;
+	char			techUp;
+	char			turnLeft;
+	char			techDown;
+	char			turnRight;
+	char			attack;
+}					t_kb;
+
+typedef struct	s_3di
+{
+	long double	posX;
+	long double	posY;
+	long double	planeX;
+	long double	planeY;
+	long double	dirX;
+	long double	dirY;
+//	long double	faceDirX;
+//	long double	faceDirY;
+	long double	velo;
+	long double rotVelo;
+	long double	mass;
+}				t_3di;
+
+typedef struct	s_actor
+{
+	int				HP;
+	int				numWeapons;
+//	t_weapon		equip[LIMIT_WEAPONS];
+	long double		active;
+	long double		invul;
+	long double		agility;
+	long double		acrobatics;
+	t_3di			obj;
+}					t_actor;
+
+typedef struct	s_player
+{
+	long double		bonus;
+	long double		bonusDuration;
+	long double		techUpWindow;
+	long double		techDownWindow;
+	t_3di			cam;
+	t_actor			actor;
+}					t_player;
+
+typedef struct	s_ray
+{
+	int			x;
+	int			mapX;
+	int			mapY;
+	int			drawStart;
+	int			drawEnd;
+	int			lineHeight;
+	int			stepX;
+	int			stepY;
+	int			hit;
+	int			side;
+	int			texX;
+	int			texY;
+	int			texNum;
+	long double	sideDistX;
+	long double	sideDistY;
+	long double	deltaDistX;
+	long double	deltaDistY;
+	long double	perpWallDist;
+	long double	cameraX;
+	long double	wallX;
+	t_3di		obj;
+}				t_ray;
+
+typedef struct	s_w3d
+{
+	t_file		mapName;
+	t_file		genConf;
+	t_file		mapConf;
+	t_kb		keys;
+	t_map		map;
+	int			resX;
+	int			resY;
+	t_player	p1;
+	t_mlx		mlx;
+	t_3di		*objs[LIMIT_OBJS];
+	t_actor		actors[LIMIT_ACTORS];
+	t_ray		*rays;
+	t_tex		*textures;
+//	t_tick		tick;
+	long double	time;
+	int			tickLength; //interval between ticks in microseconds;
+	int			tickRate;	//ticks per second;
+	long double	frameAge; //seconds since last frame was rendered;
+
+}				t_w3d;
+
+void ft_testTex(t_w3d *mother);
+void ft_printTex(t_tex *tex);
+
+void			ft_prepare(t_w3d *mother);
+int				ft_mlxPrep(t_w3d *mother);
+int				ft_loadProfile(t_w3d *mother);
+void			ft_error(int code, t_w3d *mother);
+void			ft_readConf(t_w3d *mother);
+void			ft_loadWalls(t_w3d *mother);
+void			ft_timing(t_w3d *mother);
+void			ft_decay(t_w3d *mother);
+//io
+void			ft_hooks(t_w3d *mother);
+int				exit_hook(t_w3d *mother);
+void			ft_p1Control(t_w3d *mother);
+int				key_release_hook(int keycode, t_w3d *mother);
+int				key_press_hook(int keycode, t_w3d *mother);
+int				ft_loop(t_w3d *mother);
+//obj movement
+void			ft_obj_rot(t_w3d *mother, t_3di *obj);
+void			ft_moveForward(t_w3d *mother, t_3di *ob3);
+void			ft_moveBackward(t_w3d *mother, t_3di *ob3);
+//actors
+void			ft_actor_turn(t_w3d *mother, t_actor *actor, char lr);
+void			ft_fadeLeft(t_w3d *mother);
+void			ft_fadeRight(t_w3d *mother);
+//rendering
+void	ft_allocate_rays(t_w3d *mother);
+void	ft_prepare_rays(t_w3d *mother);
+void	ft_stepnside(t_w3d *mother, t_ray *ray);
+void	ft_dda(t_w3d *mother, t_ray *ray);
+void	ft_stripe(t_w3d *mother, t_ray *ray);
+void ft_raycast(t_w3d *mother, t_ray *ray);
+void ft_render(t_w3d *mother);
+void ft_raycast_all(t_w3d *mother);
+void ft_rayTex(t_w3d *mother, t_ray *ray);
+void	ft_rayDraw(t_w3d *mother, t_ray *ray);
+void	ft_mlx_ppp(t_w3d *mother, int x, int y, t_pix color);
+void		*ft_mlximg_nav(t_mlx *mlx, int x, int y);
+void	ft_framebuffer_forget(t_w3d *mother);
+void	ft_physUpdateAll(t_w3d *mother);
+void	ft_physUpdate(t_w3d *mother, t_3di *obj);
+void	ft_dirToCam(t_w3d *mother);
+
+
+
+#endif

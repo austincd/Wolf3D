@@ -1,0 +1,62 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   phys.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adaly <marvin@42.fr>                       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/11/13 05:45:28 by adaly             #+#    #+#             */
+/*   Updated: 2017/11/24 04:53:00 by adaly            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../inc/wolf3d.h"
+
+void	ft_physUpdate(t_w3d *mother, t_3di *obj)
+{
+	long double	veloDecay;
+	long double	rotVeloDecay;
+
+	if (mother && obj)
+	{
+		printf("velo = %Lf\n", obj->velo);
+		printf("rotvelo = %Lf\n", obj->rotVelo);
+		veloDecay = obj->mass * DECAY_VELO;
+		rotVeloDecay = obj->mass * DECAY_ROTVELO + 0.5;
+		ft_moveForward(mother, obj);
+		ft_obj_rot(mother, obj);
+		obj->velo -= veloDecay;
+		if (obj->rotVelo <= -0.5 || obj->rotVelo >= 0.5)
+			obj->rotVelo -= (rotVeloDecay * ((obj->rotVelo < 0) ? -1 : 1));
+		if (obj->velo < 0.01)
+			obj->velo = (long double)0;
+		if (obj->rotVelo < 0.05 && obj->rotVelo > -0.05)
+			obj->velo = (long double)0;
+	}
+}
+
+void	ft_physUpdateAll(t_w3d *mother)
+{
+	int	counter;
+
+	counter = 0;
+	if (mother)
+	{
+		mother->objs[0] = &(mother->p1.actor.obj);
+		mother->objs[1] = &(mother->p1.cam);
+/*		while (mother->actors && counter < LIMIT_ACTORS)
+		{
+			if (mother->actors[counter].exists && \
+			mother->actors[counter].obj.exists)
+				ft_physUpdate(mother, &(mother->actors[counter].obj));
+			++counter;
+		}
+		counter = 0;*/
+		while (counter < LIMIT_OBJS)
+		{
+//			if (mother->objs[counter]->exists)
+			ft_physUpdate(mother, mother->objs[counter]);
+			++counter;
+		}
+	}
+}
