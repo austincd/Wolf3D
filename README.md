@@ -35,7 +35,9 @@ The floats that represent spatial orientation also have lower and upper bounds, 
 When moving a given distance, the direction is represented as a number of factors that we can use to determine
 how our position on each axis changes.
 
+
 let's assume that dirX(Direction X) = 0.00;
+
 
 This means that based on our current orientation, any movement forward(according to our perspective) will
 result in no change to X. We can assume that forward and backward movement now will move us along the Y axis.
@@ -43,10 +45,12 @@ The inverse is true for a dirY(Direction Y) value of zero.
 
 let's assume that dirX(Direction X) < 0.00;
 
+
 If our 'dir' for a given axis is negative, then any movement forward(once again, from our perspective) will
 result in a decrease in our position along the X axis.
 
 let's assume that dirY(Direction Y) > 0.00;
+
 
 If our 'dir' for the Y axis is positive, then any movement forward will result in Y increasing. Movement
 in Wolf3D operates off of two of these floating point directional values, dirX and dirY. Whenever we move
@@ -57,6 +61,7 @@ will bring to our position on the Y axis.
 Each Tick:
 {
 	new posX = (old posX + (distance * dirX));
+	
 	new posY = (old posY + (distance * dirY));
 }
 
