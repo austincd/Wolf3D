@@ -59,7 +59,9 @@ our location on the X axis. Similarly, we multiply the same distance by dirY for
 will bring to our position on the Y axis.
 
 Each Tick:
+
 {
+
 	new posX = (old posX + (distance * dirX));
 	
 	new posY = (old posY + (distance * dirY));
