@@ -21,6 +21,8 @@ an explicit and modifiable order to the evaluation of each object's collision ho
 each t_3di instance by the name of "priority". This char can have any one byte value, and when two objects collide,
 the t_3di instance with the higher priority value has its hook processed first.
 
+
+
 DIRECTIONS(SPATIAL ONES):
 
 Each object has one floating point number per axis to record its position, and one floating point number per
